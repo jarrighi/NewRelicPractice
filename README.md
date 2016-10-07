@@ -8,22 +8,24 @@ These instructions will get you a copy of the practice environment up and runnin
 
 ### Prerequisities
 
-Install virtualbox - more instructions to come
-Install vagrant - more instructions to come
+[Use these instructions to download and install Virtualbox for your operating system](https://www.virtualbox.org/wiki/Downloads)
 
-Once you have those installed, clone this repo and get started with the setup instructions below
+[Use these instructions to download and install Vagrant for your operating system](https://www.vagrantup.com/downloads.html)
+
+Once you have those installed, clone this repository and get started with the setup instructions below.
 
 ### Create you vagrant box
 
 Move into the cloned repository
 
 ```
-cd NewRelicPractice
+$ cd newrelic-support-training-apps
 ```
 
 You should see the following items in this directory
 
 ```
+$ ls
 Vagrantfile
 README.md
 newrelic-ruby-kata
@@ -35,13 +37,13 @@ The directories in this folder will be accessible from the virtual machine and c
 To spin up the virtual machine, run
 
 ```
-vagrant up
+$ vagrant up
 ```
 
 Once the box has been created you shoudl see that a `.vagrant` directory has been created and you can now ssh into that machine
 
 ```
-vagrant ssh
+$ vagrant ssh
 ```
 
 Once you've signed in to the machine, you're ready to start setting up the Rails app.
@@ -51,41 +53,45 @@ Once you've signed in to the machine, you're ready to start setting up the Rails
 #### Setup a postgres user 
 
 ```
-sudo su postgres
-createuser -s -W vagrant
+$ sudo su postgres
+$ createuser -s -W vagrant
 ```
 
-set your password when prompted
+Set your password when prompted
+Now that a vagrant user has been created in postgres, you can go back to the vagrant user. 
 
 ```
-exit
+$ exit
 ```
 
 #### Configure the app to connect to postgres and load data
 
 ```
-cd /vagrant/newrelic-ruby-kata/
+$ cd /vagrant/newrelic-ruby-kata/
 ```
 
 edit the config/database.yml to reflect that password
 
 ```
-bundle install
-bundle exec rake db:create
-pg_restore --verbose --clean --no-acl --no-owner -h localhost -U vagrant -d newrelic-ruby-kata_development public/sample-data.dump
+$ bundle install
+$ bundle exec rake db:create
+$ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U vagrant -d newrelic-ruby-kata_development public/sample-data.dump
 ```
 enter your password when prompted
 
 #### run the app
 
 ```
-rails server -b 0.0.0.0
+$ rails server -b 0.0.0.0
 ```
 
-you should be able to visit the app in your browser now. 
+you should be able to visit the app in your browser now by going to `http://localhost:3030/`. 
 Try visiting the loop page as well to verify the database is setup properly. 
 
 If you get an error on the page, there was probably a problem loading the sample data into postgres
+
+## Adding New Relic to the Ruby Kata App
+
 
 ## Setting up the Insights exercises
 
