@@ -4,7 +4,7 @@ We'll use this environment in training to practice installing the New Relic agen
 
 ## Getting Started
 
-These instructions will get you a copy of the practice environment up and running on your local machine. This environment is meant to be run locally for learning purposes, not in production. 
+These instructions will walk you through setting up the practice environment and apps on your local machine. This environment is meant to be run locally for learning purposes, not in production. 
 
 ### Prerequisities
 
@@ -14,7 +14,7 @@ These instructions will get you a copy of the practice environment up and runnin
 
 Once you have those installed, clone this repository and get started with the setup instructions below.
 
-### Create you vagrant box
+### Create your vagrant box
 
 Move into the cloned repository
 
@@ -22,7 +22,7 @@ Move into the cloned repository
 $ cd newrelic-support-training-apps
 ```
 
-You should see the following items in this directory
+You should see the following items in this directory...
 
 ```
 $ ls
@@ -32,7 +32,7 @@ newrelic-ruby-kata
 ```
 The Vagrantfile will allow us to create a virtual machine with Vagrant where you will do most of the lab work for this course. 
 
-The directories in this folder will be accessible from the virtual machine and contain the app and scripts we will use for our labs.
+The other directories in this folder contain the app and scripts we will use for our labs and they will be accessible from the virtual machine at `/vagrant/`. This means you can use a GUI or terminal based text editor from your host operating system, or a terminal based text editor from within the virtual machine to update the application files. 
 
 To spin up the virtual machine, run
 
@@ -40,7 +40,19 @@ To spin up the virtual machine, run
 $ vagrant up
 ```
 
-Once the box has been created you shoudl see that a `.vagrant` directory has been created and you can now ssh into that machine
+Once the machine has been created you should see that a `.vagrant` directory has been created. 
+
+```
+$  ls -A
+.git
+.gitignore
+.vagrant
+README.md
+Vagrantfile
+newrelic-ruby-kata
+```
+
+You can now ssh into the virtual machine as the `vagrant` user with the following vagrant command. 
 
 ```
 $ vagrant ssh
@@ -50,47 +62,95 @@ Once you've signed in to the machine, you're ready to start setting up the Rails
 
 ### Setting up the Ruby Kata App
 
-#### Setup a postgres user 
+The newrelic-ruby-kata app here is a modified from the one at [github.com/newrelic/newrelic-ruby-kata](https://github.com/newrelic/newrelic-ruby-kata). There are a few more steps we need to follow to get the database setup for this app. 
+
+#### 1. Setup a vagrant user in postgres
+
+We'll need to switch to the postgres user to have the necessary permissions to setup the `vagrant` postgres user.
 
 ```
 $ sudo su postgres
 $ createuser -s -W vagrant
 ```
 
-Set your password when prompted
-Now that a vagrant user has been created in postgres, you can go back to the vagrant user. 
+The `-W` will allow you to set up a password for this user right away. Set your password when prompted and be sure to write it down. We'll need this password a few steps down. Now that a vagrant user has been created in postgres, you can go back to the vagrant user. 
 
 ```
 $ exit
 ```
 
-#### Configure the app to connect to postgres and load data
+#### 2. Configure the app to connect to postgres and load data
+
+For the next few steps we'll need to work in the `newrelic-ruby-kata` directory
 
 ```
 $ cd /vagrant/newrelic-ruby-kata/
 ```
 
-edit the config/database.yml to reflect that password
+Below is a summary summary of the files and directories that we will use in this course. 
+
+```
+newrelic-ruby-kata
+├── Gemfile <- libraries required for this app
+├── README.md
+├── app <- main application logic
+│   ├── assets
+│   ├── controllers
+│   ├── helpers
+│   ├── mailers
+│   ├── models
+│   └── views
+├── config <- New Relic config file will go here
+│   ├── application.rb
+│   ├── boot.rb
+│   ├── database.yml <- add your database user password here
+│   ├── environment.rb
+│   ├── environments
+│   ├── initializers
+│   ├── locales
+│   ├── puma.rb
+│   ├── routes.rb
+│   └── secrets.yml
+├── config.ru
+├── db
+└── log <- the NR agent writes its log to this directory
+    └── development.log
+```
+
+Edit `config/database.yml` to reflect the password you set for your `vagrant` user in postgres. Now the app should be able to connect to the database. Run the following commands to install the ruby libraries for this app, create the necessary database tables and load the sample data.
+
 
 ```
 $ bundle install
 $ bundle exec rake db:create
 $ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U vagrant -d newrelic-ruby-kata_development public/sample-data.dump
 ```
-enter your password when prompted
+You'll need to enter your password when prompted
 
-#### run the app
+---
+Note: If you have errors related to passwords here, you may want to reset your vagrant user's password in postgres. You can do this by...
+
+```
+$ psql -d postgres
+psql (9.3.14)
+Type "help" for help.
+
+postgres=# ALTER USER "vagrant" WITH PASSWORD 'password';
+ALTER USER
+postgres=# \q
+```
+
+#### 3. Launch the app to check your setup
 
 ```
 $ rails server -b 0.0.0.0
 ```
 
-you should be able to visit the app in your browser now by going to `http://localhost:3030/`. 
+you should be able to visit the app in your host manchine's browser now by going to `http://localhost:3030/`. 
+
 Try visiting the loop page as well to verify the database is setup properly. 
 
-If you get an error on the page, there was probably a problem loading the sample data into postgres
-
-## Adding New Relic to the Ruby Kata App
+If you get an error on the page, there was probably a problem loading the sample data into postgres.
 
 
 ## Setting up the Insights exercises
