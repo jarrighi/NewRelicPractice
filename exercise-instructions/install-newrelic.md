@@ -4,11 +4,20 @@ General instructions for installing the New Relic agent can be found [here](http
 
 In short: 
 
-1. Add the New Relic gem to your Gemfile, with the following line
+1. Install the newrelic_rpm gem.
+
+	Add the following line to your Gemfile 
 
 	```
 	gem 'newrelic_rpm'
 	```
+	
+	Run bundler again before you restart your app.
+
+	```
+	$ bundle install
+	```
+
 
 2. Add a newrelic.yml configuration file with your license key to the config directory of your Ruby app.
 
