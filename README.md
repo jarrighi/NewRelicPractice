@@ -8,11 +8,23 @@ These instructions will walk you through setting up the practice environment and
 
 ### Prerequisities
 
-[Use these instructions to download and install Virtualbox for your operating system](https://www.virtualbox.org/wiki/Downloads)
+* **A New Relic account** 
+	
+	 Make sure it's one you have access to and can send data to. A personal account is best since you may want to experiment with settings. 
 
-[Use these instructions to download and install Vagrant for your operating system](https://www.vagrantup.com/downloads.html)
+* **Virtualbox**
 
-Once you have those installed, clone this repository and get started with the setup instructions below.
+	[Follow this link to download and install Virtualbox for your operating system](https://www.virtualbox.org/wiki/Downloads)
+
+* **Vagrant** 
+
+	[Follow this link to download and install Vagrant for your operating system](https://www.vagrantup.com/downloads.html)
+
+Once you have those three items, clone this repository and get started with the setup instructions below.
+
+```
+$ git clone https://github.com/jarrighi/newrelic-support-training-apps.git
+```
 
 ### Create your vagrant box
 
@@ -117,28 +129,29 @@ newrelic-ruby-kata
     └── development.log
 ```
 
-Edit `config/database.yml` to reflect the password you set for your `vagrant` user in postgres. Now the app should be able to connect to the database. Run the following commands to install the ruby libraries for this app, create the necessary database tables and load the sample data.
+Edit `config/database.yml` to reflect the password you set for your `vagrant` user in postgres. Now the app should be able to connect to the database. Run the following commands to install the ruby libraries for this app.
 
 
 ```
 $ bundle install
+```
+
+Create the necessary database tables.
+
+```
 $ bundle exec rake db:create
+```
+
+Load the sample data.
+
+```
 $ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U vagrant -d newrelic-ruby-kata_development public/sample-data.dump
 ```
+
 You'll need to enter your password when prompted
 
----
-Note: If you have errors related to passwords here, you may want to reset your vagrant user's password in postgres. You can do this by...
+Note: If you have errors related to passwords here, see the section on resetting postgres passwords below.
 
-```
-$ psql -d postgres
-psql (9.3.14)
-Type "help" for help.
-
-postgres=# ALTER USER "vagrant" WITH PASSWORD 'password';
-ALTER USER
-postgres=# \q
-```
 
 #### 3. Launch the app to check your setup
 
@@ -146,17 +159,36 @@ postgres=# \q
 $ rails server -b 0.0.0.0
 ```
 
-you should be able to visit the app in your host manchine's browser now by going to `http://localhost:3030/`. 
+You should now be able to visit the app in your host machine's browser by going to `http://localhost:3030/`. 
 
-Try visiting the loop page as well to verify the database is setup properly. 
+Try visiting the [loop page](`http://localhost:3030/loop`) as well to verify the database is setup properly. 
 
 If you get an error on the page, there was probably a problem loading the sample data into postgres.
 
 
-## Setting up the Insights exercises
+## Resetting your postgres user's password
 
-TODO 
+If you have errors related to passwords when setting up the database, you may want to reset your vagrant user's password in postgres. You can do this using the psql tool:
 
+```
+$ psql -d postgres
+psql (9.3.14)
+Type "help" for help.
+
+```
+
+Once you're in psql, you can run the following query.
+
+```
+postgres=# ALTER USER "vagrant" WITH PASSWORD 'password';
+ALTER USER
+```
+
+You can quit psql like this:
+
+```
+postgres=# \q
+```
 
 
 
